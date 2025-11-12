@@ -60,7 +60,7 @@ export function PDFViewerFrame({ filename, url }: PDFViewerFrame) {
   return (
     <iframe
       title="PDF Viewer"
-      src="/pdf-viewer"
+      src="./pdf-viewer"
       ref={setIframeRef}
       className={styles.pdfViewerFrame}
     />
