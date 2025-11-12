@@ -24,15 +24,20 @@ const useReceivePDFData = (): [
 
   useEffect(() => {
     const cleanup = childWindowAction.current.startListen((payload) => {
-      // detachedされる前にArrayBufferをsliceでコピー
+      // postMessageで受信したArrayBufferは転送後にdetachされる可能性があるため、
+      // 受信時に即座にコピーを作成する
       const buffer = payload.buffer.slice(0);
       const copiedArray = new Uint8Array(buffer);
-      // さらに新しいバッファを作成して確実にコピー
+
+      // PDF.jsでの表示用コピー
+      // usePDFPages内でWorkerに転送される際にArrayBufferがdetachされるため、
+      // 表示用とダウンロード用で別々のコピーを保持する必要がある
       const permanentBuffer = new ArrayBuffer(copiedArray.length);
       const permanentArray = new Uint8Array(permanentBuffer);
       permanentArray.set(copiedArray);
 
-      // ダウンロード用に別のコピーを作成
+      // ダウンロード用の独立したコピー
+      // 表示用がdetachされた後もダウンロード機能を動作させるため
       const downloadBuffer = new ArrayBuffer(copiedArray.length);
       const downloadArray = new Uint8Array(downloadBuffer);
       downloadArray.set(copiedArray);
