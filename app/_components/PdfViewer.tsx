@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { loadPDF } from "../_utils/loadPDF";
+import { type PDFPage, renderPDFPage } from "../_utils/loadPDF";
 import styles from "./PDFViewer.module.css";
 
 interface PDFViewerProps {
-  pdfUrl: string;
+  pdfPage: PDFPage;
 }
 
-function PDFViewer({ pdfUrl }: PDFViewerProps) {
+function PDFViewer({ pdfPage }: PDFViewerProps) {
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
   const [textLayerRef, setTextLayer] = useState<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -17,7 +17,7 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
     if (!canvasRef || !textLayerRef) {
       return;
     }
-    loadPDF(canvasRef, textLayerRef, pdfUrl)
+    renderPDFPage(pdfPage, canvasRef, textLayerRef)
       .then(() => {
         setLoading(false);
       })
@@ -25,7 +25,7 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
         console.error("Error loading PDF:", err);
         setLoading(false);
       });
-  }, [pdfUrl, canvasRef, textLayerRef]);
+  }, [pdfPage, canvasRef, textLayerRef]);
 
   return (
     <div className={styles.pdfContainer}>
