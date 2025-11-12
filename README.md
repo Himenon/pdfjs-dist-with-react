@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# React + pdfjs-dist + iframe
 
-## Getting Started
+[iframe + pdfjs + react](./iframe+pdfjs-dist.png)
 
-First, run the development server:
+## PDF表示までのシーケンス図
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```mermaid
+sequenceDiagram
+    participant P as Parent Window
+    participant I as Iframe
+
+    P->>I: iframeを生成 (URI: /pdf-view)
+    Note over P,I: Iframe内でページロードと<br>PDFレンダラー(pdfjs-dist)の初期化が進行
+
+    I-->>I: Iframe内部でページマウント/初期化完了<br>Parent Windowからのデータ受信準備完了
+
+    I->>P: postMessage('PDF_VIEWER_READY')<br> (PDFデータ受信準備完了通知)
+
+    P-->>P: PDFデータをfetchし、Buffer化
+
+    P->>I:  postMessage(PDF Bufferデータ)
+
+    I-->>I: postMessage受信<br>pdfjs-distを利用してPDFを描画
+    Note right of I: PDF表示完了
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## LICENCE
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
