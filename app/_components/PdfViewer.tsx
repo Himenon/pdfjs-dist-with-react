@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "./PDFViewer.module.css";
 
 const loadPDF = async (canvas: HTMLCanvasElement, pdfPath: string) => {
   // 動的インポートでブラウザ環境でのみpdf.jsを読み込む
@@ -32,7 +33,6 @@ export default function PdfViewer({ pdfUrl }: PdfViewerProps) {
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // PDFをロード
   useEffect(() => {
     if (!canvasRef) {
       return;
@@ -50,7 +50,7 @@ export default function PdfViewer({ pdfUrl }: PdfViewerProps) {
   return (
     <div>
       {loading && <p>PDFを読み込んでいます...</p>}
-      <canvas ref={setCanvasRef} width={"256px"} height="256px" />
+      <canvas ref={setCanvasRef} className={styles.pdfViewer} />
     </div>
   );
 }
