@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   useDynamicRowHeight,
   useListRef,
@@ -45,6 +45,18 @@ function LoadedPDFDataViewer({
   });
   const [scale, setScale] = useState(1.0);
   const listRef = useListRef(null);
+
+  const downloadPDF = useCallback(() => {
+    const blob = new Blob([new Uint8Array(pdfData)], {
+      type: "application/pdf",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [filename, pdfData]);
   return (
     <div>
       <div>
@@ -54,20 +66,7 @@ function LoadedPDFDataViewer({
         <button type="button" onClick={() => setScale((prev) => prev + 0.2)}>
           Zoom in
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            const blob = new Blob([new Uint8Array(pdfData)], {
-              type: "application/pdf",
-            });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(url);
-          }}
-        >
+        <button type="button" onClick={downloadPDF}>
           Download
         </button>
       </div>
