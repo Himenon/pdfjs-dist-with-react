@@ -22,14 +22,15 @@ export const createChildWindowAction = () => {
       return;
     }
     const message: ChildWindowMessage = {
-      type: "PDF_VIEWER_READY"
-    }
+      type: "PDF_VIEWER_READY",
+    };
     window.parent.postMessage(message, window.location.origin);
     console.info("Child Window: notify ready");
   };
 
   const createHandleMessage =
-    (onMessage: (message: ParentWindowMessage) => void) => (event: MessageEvent) => {
+    (onMessage: (message: ParentWindowMessage) => void) =>
+    (event: MessageEvent) => {
       /**
        * 同一オリジンのみ可能
        */
@@ -61,29 +62,30 @@ export const createChildWindowAction = () => {
   };
 };
 
-
 export const createParentWindowAction = (iframe: HTMLIFrameElement) => {
-  const transferPDF = (filename: string, data: Uint8Array<ArrayBufferLike>) => {
+  const transferPDF = (filename: string, data: Uint8Array<ArrayBuffer>) => {
     const message: ParentWindowTransferPDFMessage = {
       filename: filename,
-      chunk: new Uint8Array(data) as ArrayBuffer,
+      chunk: data.buffer,
     };
     iframe.contentWindow?.postMessage(message, window.location.origin);
   };
 
-  const createHandleMessage = (onMessage: (message: ChildWindowMessage) => void) => (event: MessageEvent) => {
-    // 同一オリジンのみ可能
-    if (event.origin !== window.location.origin) {
-      return;
-    }
-    const eventData = event.data as ChildWindowReadyMessage;
-    // iframeから準備完了の通知を受け取る
-    if (eventData.type === "PDF_VIEWER_READY") {
-      onMessage({
-        type: "PDF_VIEWER_READY",
-      })
-    }
-  }
+  const createHandleMessage =
+    (onMessage: (message: ChildWindowMessage) => void) =>
+    (event: MessageEvent) => {
+      // 同一オリジンのみ可能
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+      const eventData = event.data as ChildWindowReadyMessage;
+      // iframeから準備完了の通知を受け取る
+      if (eventData.type === "PDF_VIEWER_READY") {
+        onMessage({
+          type: "PDF_VIEWER_READY",
+        });
+      }
+    };
 
   const startListen = (onMessage: (message: ChildWindowMessage) => void) => {
     const handleMessage = createHandleMessage(onMessage);

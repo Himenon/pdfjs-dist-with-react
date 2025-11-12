@@ -15,7 +15,6 @@ const fetchPDF = async (url: string) => {
     });
 };
 
-
 const createPDFDocumentWrapper = async (source: string | Uint8Array) => {
   let pdfSource: Uint8Array;
   if (source instanceof Uint8Array) {
@@ -24,7 +23,7 @@ const createPDFDocumentWrapper = async (source: string | Uint8Array) => {
     pdfSource = await fetchPDF(source);
   }
   return createPDFDocument(pdfSource);
-}
+};
 
 export const usePDFPages = (source: string | Uint8Array) => {
   const [numPages, setNumPages] = useState<number>(0);
@@ -34,7 +33,7 @@ export const usePDFPages = (source: string | Uint8Array) => {
   /**
    * PostMessage経由できたsourceを使ってPDFDocumentを初期化する際に、UintArrayだった場合に、
    * 複数回UintArrayが使用されないようにする
-   * 
+   *
    * エラー例:
    * Failed to execute 'postMessage' on 'Worker': ArrayBuffer at index 0 is already detached.
    */

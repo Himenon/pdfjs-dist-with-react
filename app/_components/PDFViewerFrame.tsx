@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import styles from "./PDFViewerFrame.module.css";
 import {
   createParentWindowAction,
-  ParentWindowAction,
+  type ParentWindowAction,
 } from "../_shared/iframe-event";
+import styles from "./PDFViewerFrame.module.css";
 
 const fetchPDF = async (url: string) => {
   return fetch(url)
