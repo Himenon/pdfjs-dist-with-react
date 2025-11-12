@@ -2,6 +2,7 @@
 
 import { Page } from "./_components/Page";
 import PdfViewer from "./_components/PdfViewer";
+import { VariableSizeList } from "react-window";
 
 export default function Home() {
   return (
@@ -11,9 +12,11 @@ export default function Home() {
           PDF.js Viewer サンプル
         </h1>
         <div className="rounded-lg bg-white p-6 shadow-xl dark:bg-zinc-900">
-          <Page>
-            <PdfViewer pdfUrl="/sample.pdf" />
-          </Page>
+          <VariableSizeList>
+            <Page>
+              <PdfViewer pdfUrl="/sample.pdf" />
+            </Page>
+          </VariableSizeList>
         </div>
         <div className="mt-8 text-center">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
