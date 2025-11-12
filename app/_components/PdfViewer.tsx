@@ -6,9 +6,10 @@ import styles from "./PDFViewer.module.css";
 
 interface PDFViewerProps {
   pdfPage: PDFPageProxy | undefined;
+  scale: number;
 }
 
-function PDFViewer({ pdfPage }: PDFViewerProps) {
+function PDFViewer({ pdfPage, scale }: PDFViewerProps) {
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
   const [textLayerRef, setTextLayer] = useState<HTMLDivElement | null>(null);
 
@@ -16,10 +17,12 @@ function PDFViewer({ pdfPage }: PDFViewerProps) {
     if (!pdfPage || !canvasRef || !textLayerRef) {
       return;
     }
-    renderPDFPage(pdfPage, canvasRef, textLayerRef).catch((err) => {
-      console.error("Error loading PDF:", err);
-    });
-  }, [pdfPage, canvasRef, textLayerRef]);
+    renderPDFPage(pdfPage, canvasRef, textLayerRef, { scale: scale }).catch(
+      (err) => {
+        console.error("Error loading PDF:", err);
+      },
+    );
+  }, [pdfPage, canvasRef, textLayerRef, scale]);
 
   return (
     <div className={styles.pdfContainer}>

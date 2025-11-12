@@ -23,13 +23,20 @@ export const createPDFDocument = async (
   return [pdfDocument, pdfInfo];
 };
 
+type RenderOptions = {
+  scale?: number;
+};
+
 export const renderPDFPage = async (
   pdfPage: PDFPageProxy,
   canvas: HTMLCanvasElement,
   textLayer: HTMLDivElement,
+  options: RenderOptions = {
+    scale: 1.0,
+  },
 ): Promise<void> => {
   const { TextLayer } = await import("pdfjs-dist");
-  const viewport = pdfPage.getViewport({ scale: 1.0 });
+  const viewport = pdfPage.getViewport({ scale: options.scale ?? 1.0 });
   canvas.width = viewport.width;
   canvas.height = viewport.height;
   const renderTask = pdfPage.render({
