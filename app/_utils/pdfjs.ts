@@ -1,6 +1,6 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 
-export type PDFPage = PDFPageProxy;
+export type { PDFDocumentProxy, PDFPageProxy };
 
 interface PDFInfo {
   numPages: number;
@@ -48,4 +48,5 @@ export const renderPDFPage = async (
     return textLayerRenderer.render();
   });
   await textLayerRenderTask;
+  console.log({ pdfPage, canvas, textLayer })
 };
