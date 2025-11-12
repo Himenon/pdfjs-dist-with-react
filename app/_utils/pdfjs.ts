@@ -7,7 +7,7 @@ interface PDFInfo {
 }
 
 export const createPDFDocument = async (
-  source: string | ArrayBuffer,
+  source: string | Uint8Array,
 ): Promise<[PDFDocumentProxy, PDFInfo]> => {
   // 動的インポートでブラウザ環境でのみpdf.jsを読み込む
   const pdfjsLib = await import("pdfjs-dist");
