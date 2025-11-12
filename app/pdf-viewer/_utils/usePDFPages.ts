@@ -31,6 +31,14 @@ export const usePDFPages = (source: string | Uint8Array) => {
   const pdfProxy = useRef<PDFDocumentProxy | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [pages, setPages] = useState<PDFPageProxy[]>([]);
+  /**
+   * PostMessage経由できたsourceを使ってPDFDocumentを初期化する際に、UintArrayだった場合に、
+   * 複数回UintArrayが使用されないようにする
+   * 
+   * エラー例:
+   * Failed to execute 'postMessage' on 'Worker': ArrayBuffer at index 0 is already detached.
+   */
+  const isInitializedRef = useRef(false);
 
   const getPage = useCallback((page: number): Promise<PDFPageProxy> => {
     if (!pdfProxy.current) {
@@ -57,6 +65,10 @@ export const usePDFPages = (source: string | Uint8Array) => {
   );
 
   useEffect(() => {
+    if (isInitializedRef.current) {
+      return;
+    }
+    isInitializedRef.current = true;
     createPDFDocumentWrapper(source)
       .then(([pdfDocument, pdfInfo]) => {
         setNumPages(pdfInfo.numPages);

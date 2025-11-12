@@ -14,10 +14,12 @@ const useReceivePDFData = () => {
   const [pdfData, setPdfData] = useState<Uint8Array | null>(null);
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      console.log(event.data);
-      setPdfData(event.data);
+      const originalData = new Uint8Array(event.data);
+      setPdfData(new Uint8Array(originalData));
     };
     window.addEventListener("message", handleMessage);
+
+    console.log("postMessage受信準備完了");
     return () => {
       window.removeEventListener("message", handleMessage);
     };
@@ -44,10 +46,15 @@ function LoadedPDFDataViewer({ pdfData }: { pdfData: Uint8Array }) {
         <button
           type="button"
           onClick={() => {
+            const blob = new Blob([new Uint8Array(pdfData)], {
+              type: "application/pdf",
+            });
+            const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.href = pdfUrl;
+            link.href = url;
             link.download = "sample.pdf";
             link.click();
+            URL.revokeObjectURL(url);
           }}
         >
           Download

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import styles from "./PDFViewerFrame.module.css";
 
 const fetchPDF = async (url: string) => {
   return fetch(url)
@@ -25,15 +26,23 @@ export interface PDFViewerFrame {
 }
 
 export function PDFViewerFrame(props: PDFViewerFrame) {
-  const [iframeRef, setIframeRef] = useState<HTMLIFrameElement>(null);
+  const [iframeRef, setIframeRef] = useState<HTMLIFrameElement | null>(null);
   const pdf = usePDF(props.url);
 
   useEffect(() => {
-    if (!iframeRef) {
+    if (!iframeRef || !pdf) {
       return;
     }
-    iframeRef.contentWindow?.postMessage(pdf);
+    console.log("postMessage送信");
+    iframeRef.contentWindow?.postMessage(new Uint8Array(pdf));
   }, [iframeRef, pdf]);
 
-  return <iframe title="PDF Viewer" src="/pdf-viewer" ref={setIframeRef} />;
+  return (
+    <iframe
+      title="PDF Viewer"
+      src="/pdf-viewer"
+      ref={setIframeRef}
+      className={styles.pdfViewerFrame}
+    />
+  );
 }
