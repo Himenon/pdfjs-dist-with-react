@@ -5,6 +5,16 @@ import {
   type PDFPageProxy,
 } from "./pdfjs";
 
+const fetchPDF = async (url: string) => {
+  return fetch(url)
+    .then((res) => {
+      return res.arrayBuffer();
+    })
+    .then((arrayBuffer) => {
+      return new Uint8Array(arrayBuffer);
+    });
+};
+
 export const usePDFPages = (url: string) => {
   const [numPages, setNumPages] = useState<number>(0);
   const pdfProxy = useRef<PDFDocumentProxy | null>(null);
@@ -36,7 +46,8 @@ export const usePDFPages = (url: string) => {
   );
 
   useEffect(() => {
-    createPDFDocument(url)
+    fetchPDF(url)
+      .then((data) => createPDFDocument(data))
       .then(([pdfDocument, pdfInfo]) => {
         setNumPages(pdfInfo.numPages);
         pdfProxy.current = pdfDocument;

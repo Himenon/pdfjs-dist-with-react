@@ -7,7 +7,7 @@ interface PDFInfo {
 }
 
 export const createPDFDocument = async (
-  pdfPath: string,
+  source: string | ArrayBuffer,
 ): Promise<[PDFDocumentProxy, PDFInfo]> => {
   // 動的インポートでブラウザ環境でのみpdf.jsを読み込む
   const pdfjsLib = await import("pdfjs-dist");
@@ -15,7 +15,7 @@ export const createPDFDocument = async (
     // pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.4.394/build/pdf.worker.min.mjs`;
   }
-  const loadingTask = pdfjsLib.getDocument(pdfPath);
+  const loadingTask = pdfjsLib.getDocument(source);
   const pdfDocument = await loadingTask.promise;
 
   const pdfInfo = pdfDocument._pdfInfo as PDFInfo;
