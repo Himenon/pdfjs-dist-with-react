@@ -1,8 +1,15 @@
 # React + pdfjs-dist + iframe
 
-[iframe + pdfjs + react](./iframe+pdfjs-dist.png)
+![iframe + pdfjs + react](./iframe+pdfjs-dist.png)
 
-## PDF表示までのシーケンス図
+## 考察
+
+- `iframe`内で pdfjs-dist を利用することで、HTML/CSS/JS のリソースを分離できる。
+- Parent Window から`iframe`に対して PDF の情報を渡す際に`postMessage`を利用することで、PDF ビュワーのページの用途を限定できる。
+  - postMessage で渡すことにより、PDF ビュワー内がステートレスになる。
+  - クエリパラメーターや、LocalStorage などのユーザーが介入する方法がなく、PDF のデータが残らない。
+
+## PDF 表示までのシーケンス図
 
 ```mermaid
 sequenceDiagram
