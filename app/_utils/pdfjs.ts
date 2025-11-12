@@ -48,5 +48,5 @@ export const renderPDFPage = async (
     return textLayerRenderer.render();
   });
   await textLayerRenderTask;
-  console.log({ pdfPage, canvas, textLayer })
+  console.log({ pdfPage, canvas, textLayer });
 };
