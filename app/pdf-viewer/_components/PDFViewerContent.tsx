@@ -9,6 +9,7 @@ import {
 import { Page } from "./Page";
 import PDFViewer from "./PdfViewer";
 import { usePDFPages } from "../_utils/usePDFPages";
+import { IframeEvent } from "@/app/_shared/iframe-event";
 
 const useReceivePDFData = (): [string, Uint8Array<ArrayBuffer> | null] => {
   const [filename, setFilename] = useState<string>("");
@@ -36,6 +37,16 @@ const useReceivePDFData = (): [string, Uint8Array<ArrayBuffer> | null] => {
     };
     window.addEventListener("message", handleMessage);
     console.log("postMessage受信準備完了");
+
+    // 親ウィンドウに準備完了を通知
+    if (window.parent !== window) {
+      window.parent.postMessage(
+        { type: IframeEvent.PDF_VIEWER_READY },
+        window.location.origin,
+      );
+      console.log("親ウィンドウに準備完了を通知");
+    }
+
     return () => {
       window.removeEventListener("message", handleMessage);
     };
