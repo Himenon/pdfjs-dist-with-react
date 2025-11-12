@@ -10,16 +10,19 @@ import { Page } from "./_components/Page";
 import PDFViewer from "./_components/PdfViewer";
 import { usePDFPages } from "./_utils/usePDFPages";
 
-const useReceivePDFData = (): [string, Uint8Array<ArrayBufferLike> | null] => {
+const useReceivePDFData = (): [string, Uint8Array<ArrayBuffer> | null] => {
   const [filename, setFilename] = useState<string>("");
-  const [pdfData, setPdfData] = useState<Uint8Array | null>(null);
+  const [pdfData, setPdfData] = useState<Uint8Array<ArrayBuffer> | null>(null);
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const data = event.data as {
         chunk: ArrayBuffer;
         filename: string;
       };
-      setPdfData(new Uint8Array(data.chunk));
+      // Array.from()を使ってdetachedされる前に値をコピー
+      const sourceArray = new Uint8Array(data.chunk);
+      const copiedArray = Uint8Array.from(sourceArray);
+      setPdfData(copiedArray);
       setFilename(data.filename);
     };
     window.addEventListener("message", handleMessage);
@@ -37,7 +40,7 @@ function LoadedPDFDataViewer({
   pdfData,
 }: {
   filename: string;
-  pdfData: Uint8Array;
+  pdfData: Uint8Array<ArrayBuffer>;
 }) {
   const pdf = usePDFPages(pdfData);
   const rowHeight = useDynamicRowHeight({
@@ -47,7 +50,8 @@ function LoadedPDFDataViewer({
   const listRef = useListRef(null);
 
   const downloadPDF = useCallback(() => {
-    const blob = new Blob([new Uint8Array(pdfData)], {
+    // データは受信時にコピー済みなのでそのまま使用
+    const blob = new Blob([pdfData], {
       type: "application/pdf",
     });
     const url = URL.createObjectURL(blob);
