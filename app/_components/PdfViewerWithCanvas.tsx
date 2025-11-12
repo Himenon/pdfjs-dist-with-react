@@ -24,11 +24,13 @@ const loadPDF = async (canvas: HTMLCanvasElement, pdfPath: string) => {
 	await renderTask.promise;
 };
 
-interface PdfViewerProps {
+interface PdfViewerWithCanvasProps {
 	pdfUrl: string;
 }
 
-export default function PdfViewer({ pdfUrl }: PdfViewerProps) {
+export default function PdfViewerWithCanvas({
+	pdfUrl,
+}: PdfViewerWithCanvasProps) {
 	const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 
