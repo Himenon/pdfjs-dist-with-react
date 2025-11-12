@@ -12,7 +12,6 @@ export const createPDFDocument = async (
   // 動的インポートでブラウザ環境でのみpdf.jsを読み込む
   const pdfjsLib = await import("pdfjs-dist");
   if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-    // pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.4.394/build/pdf.worker.min.mjs`;
   }
   const loadingTask = pdfjsLib.getDocument(source);
