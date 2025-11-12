@@ -73,12 +73,6 @@ export const createParentWindowAction = (iframe: HTMLIFrameElement) => {
       filename: filename,
       buffer: newBuffer,
     };
-    console.log("transferPDF: Sending message", {
-      filename,
-      originalSize: data.length,
-      newArraySize: newArray.length,
-      bufferSize: newBuffer.byteLength,
-    });
     iframe.contentWindow?.postMessage(message, window.location.origin);
   };
 

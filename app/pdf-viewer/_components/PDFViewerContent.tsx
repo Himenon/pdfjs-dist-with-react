@@ -24,25 +24,13 @@ const useReceivePDFData = (): [
 
   useEffect(() => {
     const cleanup = childWindowAction.current.startListen((payload) => {
-      console.log("PDFViewerContent: Received data", {
-        filename: payload.filename,
-        bufferSize: payload.buffer.byteLength,
-      });
       // detachedされる前にArrayBufferをsliceでコピー
       const buffer = payload.buffer.slice(0);
       const copiedArray = new Uint8Array(buffer);
-      console.log("PDFViewerContent: Copied data", {
-        copiedSize: copiedArray.length,
-        copiedBufferSize: copiedArray.buffer.byteLength,
-      });
       // さらに新しいバッファを作成して確実にコピー
       const permanentBuffer = new ArrayBuffer(copiedArray.length);
       const permanentArray = new Uint8Array(permanentBuffer);
       permanentArray.set(copiedArray);
-      console.log("PDFViewerContent: Permanent copy created", {
-        permanentSize: permanentArray.length,
-        permanentBufferSize: permanentArray.buffer.byteLength,
-      });
 
       // ダウンロード用に別のコピーを作成
       const downloadBuffer = new ArrayBuffer(copiedArray.length);
@@ -69,10 +57,6 @@ function LoadedPDFDataViewer({
   pdfData: Uint8Array<ArrayBuffer>;
   downloadData: Uint8Array<ArrayBuffer>;
 }) {
-  console.log("LoadedPDFDataViewer: Received pdfData", {
-    pdfDataSize: pdfData.length,
-    pdfDataBufferSize: pdfData.buffer.byteLength,
-  });
   const pdf = usePDFPages(pdfData);
   const rowHeight = useDynamicRowHeight({
     defaultRowHeight: 600,
@@ -81,15 +65,10 @@ function LoadedPDFDataViewer({
   const listRef = useListRef(null);
 
   const downloadPDF = useCallback(() => {
-    console.log("downloadPDF: Creating blob", {
-      downloadDataSize: downloadData.length,
-      downloadDataBufferSize: downloadData.buffer.byteLength,
-    });
     // ダウンロード専用のコピーを使用
     const blob = new Blob([downloadData], {
       type: "application/pdf",
     });
-    console.log("downloadPDF: Blob created", { blobSize: blob.size });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;

@@ -53,11 +53,6 @@ export function PDFViewerFrame({ filename, url }: PDFViewerFrame) {
 
   useEffect(() => {
     if (pdf && iframeStatus === "ready") {
-      console.log("PDFViewerFrame: Sending PDF data", {
-        filename,
-        pdfSize: pdf.length,
-        pdfBufferSize: pdf.buffer.byteLength,
-      });
       parentWindowAction.current?.transferPDF(filename, pdf);
     }
   }, [filename, iframeStatus, pdf]);
