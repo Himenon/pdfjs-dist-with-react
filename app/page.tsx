@@ -14,7 +14,9 @@ export default function Home() {
   const rowHeight = useDynamicRowHeight({
     defaultRowHeight: 600,
   });
-  const pdf = usePDFPages("/sample.pdf");
+
+  const pdfUrl = "/sample.pdf";
+  const pdf = usePDFPages(pdfUrl);
   const [scale, setScale] = useState(1.0);
   const listRef = useListRef(null);
 
@@ -25,11 +27,22 @@ export default function Home() {
           PDF.js Viewer サンプル
         </h1>
         <div>
-          <button type="button" onClick={() => setScale((prev) => prev + 0.1)}>
-            Scale +0.1
+          <button type="button" onClick={() => setScale((prev) => prev - 0.2)}>
+            Zoom Out
           </button>
-          <button type="button" onClick={() => setScale((prev) => prev - 0.1)}>
-            Scale -0.1
+          <button type="button" onClick={() => setScale((prev) => prev + 0.2)}>
+            Zoom in
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const link = document.createElement("a");
+              link.href = pdfUrl;
+              link.download = "sample.pdf";
+              link.click();
+            }}
+          >
+            Download
           </button>
         </div>
         <div
@@ -37,7 +50,6 @@ export default function Home() {
             width: "100%",
             height: "80vh",
             background: "#CCC",
-            padding: "8px 0",
           }}
         >
           {!pdf.loading && (
@@ -46,7 +58,10 @@ export default function Home() {
               rowCount={pdf.numPages}
               rowHeight={rowHeight}
               rowProps={{}}
-              style={{}}
+              overscanCount={1}
+              style={{
+                padding: "16px 0 0 0",
+              }}
               rowComponent={(props) => {
                 const page = props.index + 1;
                 pdf.fetchPageWithCache(page);
