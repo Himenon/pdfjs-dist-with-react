@@ -1,5 +1,7 @@
 # React + pdfjs-dist + iframe
 
+[iframe + pdfjs + react](./iframe+pdfjs-dist.png)
+
 ## PDF表示までのシーケンス図
 
 ```mermaid
