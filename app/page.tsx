@@ -10,7 +10,7 @@ export default function Home() {
         PDF Viewer を新しいタブで開く
       </a>
       <div style={{ width: "100vw", height: "80vh" }}>
-        <PDFViewerFrame filename="sample.pdf" url="/sample.pdf" />
+        <PDFViewerFrame filename="sample.pdf" url="./sample.pdf" />
       </div>
     </div>
   );
