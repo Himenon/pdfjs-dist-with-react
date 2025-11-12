@@ -1,6 +1,6 @@
 "use client";
 
-import { List as VariableSizeList } from "react-window";
+import { List as VariableSizeList, useDynamicRowHeight } from "react-window";
 import useResizeObserver from "use-resize-observer";
 import { Page } from "./_components/Page";
 import PDFViewer from "./_components/PdfViewer";
@@ -8,6 +8,9 @@ import { usePDFPages } from "./_utils/usePDFPages";
 
 export default function Home() {
   const { ref, height: internalHeight = 600 } = useResizeObserver();
+  const rowHeight = useDynamicRowHeight({
+    defaultRowHeight: 600,
+  });
   const pdf = usePDFPages("/sample.pdf");
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 p-8 dark:bg-black">
@@ -19,17 +22,17 @@ export default function Home() {
           ref={ref}
           style={{
             width: "100%",
-            height: "400px",
+            height: "80vh",
+            background: "#CCC",
+            padding: "8px 0",
           }}
         >
           {!pdf.loading && (
             <VariableSizeList
               rowCount={pdf.numPages}
-              rowHeight={internalHeight}
+              rowHeight={rowHeight}
               rowProps={{}}
-              style={{
-                marginBottom: "40px",
-              }}
+              style={{}}
               rowComponent={(props) => {
                 const page = props.index + 1;
                 pdf.fetchPageWithCache(page);
@@ -42,11 +45,13 @@ export default function Home() {
             />
           )}
         </div>
-        <div className="mt-8 text-center">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            ※ public/sample.pdf を配置するか、任意のPDFのURLを指定してください
-          </p>
-        </div>
+        {pdf.loading && (
+          <div>
+            <p>
+              ※ public/sample.pdf を配置するか、任意のPDFのURLを指定してください
+            </p>
+          </div>
+        )}
       </main>
     </div>
   );

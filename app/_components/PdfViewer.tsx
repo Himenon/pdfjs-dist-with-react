@@ -20,6 +20,7 @@ function PDFViewer({ pdfPage }: PDFViewerProps) {
       console.error("Error loading PDF:", err);
     });
   }, [pdfPage, canvasRef, textLayerRef]);
+
   return (
     <div className={styles.pdfContainer}>
       <canvas ref={setCanvasRef} className={styles.pdfViewer} />
