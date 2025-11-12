@@ -6,7 +6,7 @@ export type ChildWindowMessage = ChildWindowReadyMessage;
 
 interface ParentWindowTransferPDFMessage {
   filename: string;
-  chunk: ArrayBuffer;
+  buffer: ArrayBuffer;
 }
 
 export type ParentWindowMessage = ParentWindowTransferPDFMessage;
@@ -43,7 +43,7 @@ export const createChildWindowAction = () => {
       const data = event.data as ParentWindowTransferPDFMessage;
       onMessage({
         filename: data.filename,
-        chunk: data.chunk,
+        buffer: data.buffer,
       });
     };
 
@@ -66,7 +66,7 @@ export const createParentWindowAction = (iframe: HTMLIFrameElement) => {
   const transferPDF = (filename: string, data: Uint8Array<ArrayBuffer>) => {
     const message: ParentWindowTransferPDFMessage = {
       filename: filename,
-      chunk: data.buffer,
+      buffer: data.buffer,
     };
     iframe.contentWindow?.postMessage(message, window.location.origin);
   };

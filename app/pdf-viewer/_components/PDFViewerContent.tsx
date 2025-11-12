@@ -19,7 +19,7 @@ const useReceivePDFData = (): [string, Uint8Array<ArrayBuffer> | null] => {
   useEffect(() => {
     const cleanup = childWindowAction.current.startListen((payload) => {
       // Array.from()を使ってdetachedされる前に値をコピー
-      const sourceArray = new Uint8Array(payload.chunk);
+      const sourceArray = new Uint8Array(payload.buffer);
       const copiedArray = Uint8Array.from(sourceArray);
       setPdfData(copiedArray);
       setFilename(payload.filename);
