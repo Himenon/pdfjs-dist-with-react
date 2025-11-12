@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   useDynamicRowHeight,
   useListRef,
@@ -9,47 +9,23 @@ import {
 import { Page } from "./Page";
 import PDFViewer from "./PdfViewer";
 import { usePDFPages } from "../_utils/usePDFPages";
-import { IframeEvent } from "@/app/_shared/iframe-event";
+import { createChildWindowAction } from "@/app/_shared/iframe-event";
 
 const useReceivePDFData = (): [string, Uint8Array<ArrayBuffer> | null] => {
   const [filename, setFilename] = useState<string>("");
   const [pdfData, setPdfData] = useState<Uint8Array<ArrayBuffer> | null>(null);
+  const childWindowAction = useRef(createChildWindowAction());
+
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      /**
-       * 同一オリジンのみ可能
-       */
-      if (event.origin !== window.location.origin) {
-        console.warn(
-          `Blocked postMessage from different origin: ${event.origin}`,
-        );
-        return;
-      }
-      const data = event.data as {
-        chunk: ArrayBuffer;
-        filename: string;
-      };
+    const cleanup = childWindowAction.current.startListen((payload) => {
       // Array.from()を使ってdetachedされる前に値をコピー
-      const sourceArray = new Uint8Array(data.chunk);
+      const sourceArray = new Uint8Array(payload.chunk);
       const copiedArray = Uint8Array.from(sourceArray);
       setPdfData(copiedArray);
-      setFilename(data.filename);
-    };
-    window.addEventListener("message", handleMessage);
-    console.log("postMessage受信準備完了");
-
-    // 親ウィンドウに準備完了を通知
-    if (window.parent !== window) {
-      window.parent.postMessage(
-        { type: IframeEvent.PDF_VIEWER_READY },
-        window.location.origin,
-      );
-      console.log("親ウィンドウに準備完了を通知");
-    }
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
+      setFilename(payload.filename);
+    });
+    childWindowAction.current.notifyReady();
+    return cleanup;
   }, []);
 
   return [filename, pdfData];

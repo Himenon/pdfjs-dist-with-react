@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./PDFViewerFrame.module.css";
-import { IframeEvent } from "../_shared/iframe-event";
+import {
+  createParentWindowAction,
+  ParentWindowAction,
+} from "../_shared/iframe-event";
 
 const fetchPDF = async (url: string) => {
   return fetch(url)
@@ -28,6 +31,7 @@ export interface PDFViewerFrame {
 }
 
 export function PDFViewerFrame({ filename, url }: PDFViewerFrame) {
+  const parentWindowAction = useRef<ParentWindowAction | null>(null);
   const [iframeRef, setIframeRef] = useState<HTMLIFrameElement | null>(null);
   const [iframeStatus, setIframeStatus] = useState<"not-ready" | "ready">(
     "not-ready",
@@ -35,35 +39,23 @@ export function PDFViewerFrame({ filename, url }: PDFViewerFrame) {
   const pdf = usePDF(url);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // 同一オリジンのみ可能
-      if (event.origin !== window.location.origin) {
-        return;
-      }
-      // iframeから準備完了の通知を受け取る
-      if (event.data?.type === IframeEvent.PDF_VIEWER_READY) {
-        setIframeStatus("ready");
-      }
-    };
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!iframeRef || !pdf || iframeStatus !== "ready") {
+    if (!iframeRef) {
       return;
     }
-    console.log("postMessage送信");
-    iframeRef.contentWindow?.postMessage(
-      {
-        filename: filename,
-        chunk: new Uint8Array(pdf),
-      },
-      window.location.origin,
-    );
-  }, [iframeRef, pdf, filename, iframeStatus]);
+    parentWindowAction.current = createParentWindowAction(iframeRef);
+    const cleanup = parentWindowAction.current.startListen((payload) => {
+      if (payload.type === "PDF_VIEWER_READY") {
+        setIframeStatus("ready");
+      }
+    });
+    return cleanup;
+  }, [iframeRef]);
+
+  useEffect(() => {
+    if (pdf && iframeStatus === "ready") {
+      parentWindowAction.current?.transferPDF(filename, new Uint8Array(pdf));
+    }
+  }, [filename, iframeStatus, pdf]);
 
   return (
     <iframe
