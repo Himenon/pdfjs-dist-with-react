@@ -1,13 +1,11 @@
 "use client";
 
 import { useDynamicRowHeight, List as VariableSizeList } from "react-window";
-import useResizeObserver from "use-resize-observer";
 import { Page } from "./_components/Page";
 import PDFViewer from "./_components/PdfViewer";
 import { usePDFPages } from "./_utils/usePDFPages";
 
 export default function Home() {
-  const { ref, height: internalHeight = 600 } = useResizeObserver();
   const rowHeight = useDynamicRowHeight({
     defaultRowHeight: 600,
   });
@@ -19,7 +17,6 @@ export default function Home() {
           PDF.js Viewer サンプル
         </h1>
         <div
-          ref={ref}
           style={{
             width: "100%",
             height: "80vh",
