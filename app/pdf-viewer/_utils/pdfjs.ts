@@ -1,4 +1,5 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+import * as pdfjsLib from "pdfjs-dist";
 
 export type { PDFDocumentProxy, PDFPageProxy };
 
@@ -9,8 +10,6 @@ interface PDFInfo {
 export const createPDFDocument = async (
   source: string | Uint8Array,
 ): Promise<[PDFDocumentProxy, PDFInfo]> => {
-  // 動的インポートでブラウザ環境でのみpdf.jsを読み込む
-  const pdfjsLib = await import("pdfjs-dist");
   if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.4.394/build/pdf.worker.min.mjs`;
   }
@@ -34,7 +33,6 @@ export const renderPDFPage = async (
     scale: 1.0,
   },
 ): Promise<void> => {
-  const { TextLayer } = await import("pdfjs-dist");
   const viewport = pdfPage.getViewport({ scale: options.scale ?? 1.0 });
   canvas.width = viewport.width;
   canvas.height = viewport.height;
@@ -46,7 +44,7 @@ export const renderPDFPage = async (
   await renderTask.promise;
 
   const textLayerRenderTask = pdfPage.getTextContent().then((textContent) => {
-    const textLayerRenderer = new TextLayer({
+    const textLayerRenderer = new pdfjsLib.TextLayer({
       textContentSource: textContent,
       viewport: viewport,
       container: textLayer,
