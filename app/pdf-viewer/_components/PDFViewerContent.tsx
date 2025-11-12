@@ -115,21 +115,19 @@ export default function PDFViewerContent() {
     return "server";
   }, []);
 
-  if (pdfData) {
-    return <LoadedPDFDataViewer filename={filename} pdfData={pdfData} />;
-  }
-
   if (frameType === "not-in-iframe") {
     return (
       <div>
         <p>
-          {frameType}
           このURLをiframeで開いて、postMessageからPDFのデータを送信してください。
         </p>
       </div>
     );
   }
   if (frameType === "in-iframe") {
+    if (pdfData) {
+      return <LoadedPDFDataViewer filename={filename} pdfData={pdfData} />;
+    }
     return (
       <div>
         <p>Loading....</p>
