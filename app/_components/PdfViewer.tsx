@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import styles from "./PDFViewer.module.css";
 
-const loadPDF = async (canvas: HTMLCanvasElement, pdfPath: string) => {
+const loadPDF = async (
+  canvas: HTMLCanvasElement,
+  textLayer: HTMLDivElement,
+  pdfPath: string,
+) => {
   // 動的インポートでブラウザ環境でのみpdf.jsを読み込む
   const pdfjsLib = await import("pdfjs-dist");
   // PDF.jsのworkerを設定
@@ -22,22 +26,34 @@ const loadPDF = async (canvas: HTMLCanvasElement, pdfPath: string) => {
     viewport,
     canvas,
   });
+
   await renderTask.promise;
+
+  const textLayerRenderTask = pdfPage.getTextContent().then((textContent) => {
+    const textLayerRenderer = new pdfjsLib.TextLayer({
+      textContentSource: textContent,
+      viewport: viewport,
+      container: textLayer,
+    });
+    return textLayerRenderer.render();
+  });
+  await textLayerRenderTask;
 };
 
-interface PdfViewerProps {
+interface PDFViewerProps {
   pdfUrl: string;
 }
 
-export default function PdfViewer({ pdfUrl }: PdfViewerProps) {
+export default function PDFViewer({ pdfUrl }: PDFViewerProps) {
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
+  const [textLayerRef, setTextLayer] = useState<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (!canvasRef) {
+    if (!canvasRef || !textLayerRef) {
       return;
     }
-    loadPDF(canvasRef, pdfUrl)
+    loadPDF(canvasRef, textLayerRef, pdfUrl)
       .then(() => {
         setLoading(false);
       })
@@ -45,12 +61,13 @@ export default function PdfViewer({ pdfUrl }: PdfViewerProps) {
         console.error("Error loading PDF:", err);
         setLoading(false);
       });
-  }, [pdfUrl, canvasRef]);
+  }, [pdfUrl, canvasRef, textLayerRef]);
 
   return (
-    <div>
+    <div className={styles.pdfContainer}>
       {loading && <p>PDFを読み込んでいます...</p>}
       <canvas ref={setCanvasRef} className={styles.pdfViewer} />
+      <div ref={setTextLayer} className={styles.textLayer} />
     </div>
   );
 }

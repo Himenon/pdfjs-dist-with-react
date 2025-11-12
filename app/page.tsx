@@ -1,5 +1,6 @@
 "use client";
 
+import { Page } from "./_components/Page";
 import PdfViewer from "./_components/PdfViewer";
 
 export default function Home() {
@@ -10,7 +11,9 @@ export default function Home() {
           PDF.js Viewer サンプル
         </h1>
         <div className="rounded-lg bg-white p-6 shadow-xl dark:bg-zinc-900">
-          <PdfViewer pdfUrl="/sample.pdf" />
+          <Page>
+            <PdfViewer pdfUrl="/sample.pdf" />
+          </Page>
         </div>
         <div className="mt-8 text-center">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
