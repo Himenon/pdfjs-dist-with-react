@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useDynamicRowHeight,
   useListRef,
@@ -10,16 +10,28 @@ import { Page } from "./_components/Page";
 import PDFViewer from "./_components/PdfViewer";
 import { usePDFPages } from "./_utils/usePDFPages";
 
-export default function Home() {
+const useReceivePDFData = () => {
+  const [pdfData, setPdfData] = useState<Uint8Array | null>(null);
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      console.log(event.data);
+      setPdfData(event.data);
+    };
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+  return pdfData;
+};
+
+function LoadedPDFDataViewer({ pdfData }: { pdfData: Uint8Array }) {
+  const pdf = usePDFPages(pdfData);
   const rowHeight = useDynamicRowHeight({
     defaultRowHeight: 600,
   });
-
-  const pdfUrl = "/sample.pdf";
-  const pdf = usePDFPages(pdfUrl);
   const [scale, setScale] = useState(1.0);
   const listRef = useListRef(null);
-
   return (
     <div>
       <div>
@@ -72,4 +84,12 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+export default function PDFViewerPage() {
+  const pdfData = useReceivePDFData();
+  if (pdfData) {
+    return <LoadedPDFDataViewer pdfData={pdfData} />;
+  }
+  return <div>Loading....</div>;
 }

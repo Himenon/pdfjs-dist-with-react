@@ -15,7 +15,18 @@ const fetchPDF = async (url: string) => {
     });
 };
 
-export const usePDFPages = (url: string) => {
+
+const createPDFDocumentWrapper = async (source: string | Uint8Array) => {
+  let pdfSource: Uint8Array;
+  if (source instanceof Uint8Array) {
+    pdfSource = source;
+  } else {
+    pdfSource = await fetchPDF(source);
+  }
+  return createPDFDocument(pdfSource);
+}
+
+export const usePDFPages = (source: string | Uint8Array) => {
   const [numPages, setNumPages] = useState<number>(0);
   const pdfProxy = useRef<PDFDocumentProxy | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,8 +57,7 @@ export const usePDFPages = (url: string) => {
   );
 
   useEffect(() => {
-    fetchPDF(url)
-      .then((data) => createPDFDocument(data))
+    createPDFDocumentWrapper(source)
       .then(([pdfDocument, pdfInfo]) => {
         setNumPages(pdfInfo.numPages);
         pdfProxy.current = pdfDocument;
@@ -55,7 +65,7 @@ export const usePDFPages = (url: string) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [url]);
+  }, [source]);
 
   return {
     numPages,
