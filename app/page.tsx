@@ -7,7 +7,7 @@ export default function Home() {
     <div>
       <h1>PDF.js Viewer サンプル</h1>
       <div style={{ width: "100vw", height: "80vh" }}>
-        <PDFViewerFrame url={"/sample.pdf"} />
+        <PDFViewerFrame filename="sample.pdf" url="/sample.pdf" />
       </div>
     </div>
   );

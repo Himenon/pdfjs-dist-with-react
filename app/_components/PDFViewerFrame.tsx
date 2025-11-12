@@ -22,20 +22,24 @@ const usePDF = (url: string) => {
 };
 
 export interface PDFViewerFrame {
+  filename: string;
   url: string;
 }
 
-export function PDFViewerFrame(props: PDFViewerFrame) {
+export function PDFViewerFrame({ filename, url }: PDFViewerFrame) {
   const [iframeRef, setIframeRef] = useState<HTMLIFrameElement | null>(null);
-  const pdf = usePDF(props.url);
+  const pdf = usePDF(url);
 
   useEffect(() => {
     if (!iframeRef || !pdf) {
       return;
     }
     console.log("postMessage送信");
-    iframeRef.contentWindow?.postMessage(new Uint8Array(pdf));
-  }, [iframeRef, pdf]);
+    iframeRef.contentWindow?.postMessage({
+      filename: filename,
+      chunk: new Uint8Array(pdf),
+    });
+  }, [iframeRef, pdf, filename]);
 
   return (
     <iframe

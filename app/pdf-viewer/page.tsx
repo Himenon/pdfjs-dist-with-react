@@ -10,24 +10,35 @@ import { Page } from "./_components/Page";
 import PDFViewer from "./_components/PdfViewer";
 import { usePDFPages } from "./_utils/usePDFPages";
 
-const useReceivePDFData = () => {
+const useReceivePDFData = (): [string, Uint8Array<ArrayBufferLike> | null] => {
+  const [filename, setFilename] = useState<string>("");
   const [pdfData, setPdfData] = useState<Uint8Array | null>(null);
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      const originalData = new Uint8Array(event.data);
-      setPdfData(new Uint8Array(originalData));
+      const data = event.data as {
+        chunk: ArrayBuffer;
+        filename: string;
+      };
+      setPdfData(new Uint8Array(data.chunk));
+      setFilename(data.filename);
     };
     window.addEventListener("message", handleMessage);
-
     console.log("postMessage受信準備完了");
     return () => {
       window.removeEventListener("message", handleMessage);
     };
   }, []);
-  return pdfData;
+
+  return [filename, pdfData];
 };
 
-function LoadedPDFDataViewer({ pdfData }: { pdfData: Uint8Array }) {
+function LoadedPDFDataViewer({
+  filename,
+  pdfData,
+}: {
+  filename: string;
+  pdfData: Uint8Array;
+}) {
   const pdf = usePDFPages(pdfData);
   const rowHeight = useDynamicRowHeight({
     defaultRowHeight: 600,
@@ -52,7 +63,7 @@ function LoadedPDFDataViewer({ pdfData }: { pdfData: Uint8Array }) {
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = "sample.pdf";
+            link.download = filename;
             link.click();
             URL.revokeObjectURL(url);
           }}
@@ -94,9 +105,9 @@ function LoadedPDFDataViewer({ pdfData }: { pdfData: Uint8Array }) {
 }
 
 export default function PDFViewerPage() {
-  const pdfData = useReceivePDFData();
+  const [filename, pdfData] = useReceivePDFData();
   if (pdfData) {
-    return <LoadedPDFDataViewer pdfData={pdfData} />;
+    return <LoadedPDFDataViewer filename={filename} pdfData={pdfData} />;
   }
   return <div>Loading....</div>;
 }
