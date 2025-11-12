@@ -63,10 +63,15 @@ export const createChildWindowAction = () => {
 };
 
 export const createParentWindowAction = (iframe: HTMLIFrameElement) => {
-  const transferPDF = (filename: string, data: Uint8Array<ArrayBuffer>) => {
+  const transferPDF = (filename: string, data: Uint8Array) => {
+    // 新しいArrayBufferを作成してデータをコピー
+    const newBuffer = new ArrayBuffer(data.length);
+    const newArray = new Uint8Array(newBuffer);
+    newArray.set(data);
+
     const message: ParentWindowTransferPDFMessage = {
       filename: filename,
-      buffer: data.buffer,
+      buffer: newBuffer,
     };
     iframe.contentWindow?.postMessage(message, window.location.origin);
   };
